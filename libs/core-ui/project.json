@@ -1,0 +1,9 @@
+{
+  "name": "core-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core-ui/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project core-ui --web",
+  "targets": {}
+}
