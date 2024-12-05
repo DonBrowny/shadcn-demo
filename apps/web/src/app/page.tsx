@@ -1,9 +1,12 @@
 'use client'
 import { useSession } from 'next-auth/react'
 import { Logout } from '../components/logout'
+import { scopesHook } from '@shadcn-demo/data-provider/lib/scopes-hook'
 
 export default function Index() {
   const { data: session } = useSession()
+  const { getScopes } = scopesHook
+  const scopes = getScopes()
   console.log(session)
   if (!session?.user) {
     return null
@@ -25,6 +28,7 @@ export default function Index() {
         </section>
 
         <span className='text-center w-full inline-block mb-4'>Roles : {session.user.roles.toString()}</span>
+        <span className='text-center w-full inline-block mb-4'>Permissions : {scopes.toString()}</span>
       </div>
     </div>
   )

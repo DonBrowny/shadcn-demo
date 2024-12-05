@@ -1,7 +1,9 @@
 import { Lato } from 'next/font/google'
 import NextTopLoader from 'nextjs-toploader'
+import { AuthProvider } from '../providers/auth-providers'
+import { ReduxProvider } from '../providers/redux-provider'
+import { auth } from '../auth'
 import './global.css'
-import { Providers } from './providers'
 
 export const metadata = {
   title: 'Welcome to web',
@@ -14,7 +16,23 @@ const lato = Lato({
   display: 'swap',
 })
 
+async function getUserPermissions(token: string) {
+  const orgId = process.env.LOGTO_ORG_ID
+  const url = process.env.BACKEND_BASE_URL
+  const response = await fetch(`${url}/organizations/${orgId}/user/permissions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const data = await response.json()
+  console.log(data)
+  return data.scopes
+}
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+  let scopes = []
+  if (session?.user && session.user.accessToken) {
+    scopes = await getUserPermissions(session.user.accessToken)
+  }
   return (
     <html
       lang='en'
@@ -22,10 +40,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning={true}
     >
       <body className={'overflow-hidden'}>
-        <Providers>
-          <NextTopLoader showSpinner={false} />
-          {children}
-        </Providers>
+        <AuthProvider>
+          <ReduxProvider scopes={scopes}>
+            <NextTopLoader showSpinner={false} />
+            {children}
+          </ReduxProvider>
+        </AuthProvider>
       </body>
     </html>
   )

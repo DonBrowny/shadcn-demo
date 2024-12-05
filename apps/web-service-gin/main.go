@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"github.com/joho/godotenv"
@@ -91,7 +92,6 @@ func getAccessToken() (string, error) {
 func getUserInfo(userToken string) (*LogtoUser, error) {
 
 	userinfoEndpoint := os.Getenv("LOGTO_ENDPOINT") + "/oidc/me"
-	fmt.Println(userToken)
 
 	client := resty.New()
 	resp, err := client.R().
@@ -110,7 +110,6 @@ func getUserInfo(userToken string) (*LogtoUser, error) {
 
 func getUserPermissionsForOrg(userId string, orgId string, token string) ([]UserOrgPermissions, error) {
 	url := os.Getenv("LOGTO_ENDPOINT") + "/api/organizations/" + orgId + "/users/" + userId + "/scopes"
-	fmt.Println(url)
 	client := resty.New()
 	var permissions []UserOrgPermissions
 	_, err := client.R().
@@ -156,10 +155,8 @@ func userPermissionsHandler(c *gin.Context) {
 	}
 
 	scopes := lo.Map(permissions, func(permission UserOrgPermissions, _ int) string {
-		fmt.Println("permission", permission)
 		return permission.Name
 	})
-	fmt.Println(scopes)
 
 	c.Header("Content-Type", "application/json")
 	c.JSON(200, gin.H{"scopes": scopes})
@@ -171,6 +168,7 @@ func main() {
 		fmt.Println("Error loading .env file")
 	}
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.GET("/albums", getAlbums)
 	router.GET("/organizations/:orgId/user/permissions", userPermissionsHandler)
 

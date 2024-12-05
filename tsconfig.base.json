@@ -17,6 +17,7 @@
     "paths": {
       "@shadcn-demo/core-ui": ["libs/core-ui/src/index.ts"],
       "@shadcn-demo/core-ui/*": ["libs/core-ui/src/*"],
+      "@shadcn-demo/data-provider/*": ["libs/data-provider/src/*"],
       "@shadcn-demo/utils": ["libs/utils/src/index.ts"]
     }
   },
